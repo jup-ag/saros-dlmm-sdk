@@ -247,7 +247,8 @@ impl Pair {
     }
 
     pub fn update_references(&mut self, block_timestamp: u64) -> Result<()> {
-        let time_delta = block_timestamp - self.dynamic_fee_parameters.time_last_updated;
+        let time_delta =
+            block_timestamp.saturating_sub(self.dynamic_fee_parameters.time_last_updated);
 
         if time_delta >= u64::from(self.static_fee_parameters.filter_period) {
             self.dynamic_fee_parameters.id_reference = self.active_id;
