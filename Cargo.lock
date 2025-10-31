@@ -4397,7 +4397,6 @@ dependencies = [
  "anyhow",
  "arrayref",
  "proptest",
- "rewarder-hook",
  "ruint",
  "solana-sdk",
  "spl-token 8.0.0",
