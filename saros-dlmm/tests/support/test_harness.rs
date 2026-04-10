@@ -4,8 +4,8 @@ use assert_matches::assert_matches;
 use async_trait::async_trait;
 use glob::glob;
 use jupiter_amm_interface::{
-    AccountMap, AmmContext, ClockRef, KeyedUiAccount, QuoteParams, SwapAndAccountMetas, SwapMode,
-    SwapParams,
+    AccountMap, Amm, AmmContext, ClockRef, FeeMode, KeyedAccount, KeyedUiAccount, QuoteParams,
+    SwapAndAccountMetas, SwapMode, SwapParams,
 };
 use lazy_static::lazy_static;
 
@@ -18,6 +18,7 @@ use saros_sdk::{
     utils::helper::{find_hook_bin_array_at_position, find_hook_position, is_swap_for_y},
 };
 use serde_json::{json, Value};
+use solana_account::Account;
 use solana_account_decoder::{encode_ui_account, UiAccount, UiAccountEncoding};
 
 use saros_sdk::{
@@ -37,22 +38,26 @@ use solana_client::{
     rpc_response::{Response, RpcKeyedAccount, RpcResponseContext},
     rpc_sender::{RpcSender, RpcTransportStats},
 };
+use solana_clock::Clock;
+use solana_compute_budget_interface::ComputeBudgetInstruction;
+use solana_instruction::Instruction;
+use solana_keypair::Keypair;
+use solana_program_option::COption;
+use solana_program_pack::Pack;
 use solana_program_test::{BanksClient, BanksClientError, ProgramTestContext};
-use solana_sdk::{
-    account::Account, clock::Clock, compute_budget::ComputeBudgetInstruction,
-    instruction::Instruction, program_option::COption, program_pack::Pack, pubkey::Pubkey,
-    signature::Keypair, signer::Signer, sysvar, transaction::Transaction,
-};
-use spl_associated_token_account::get_associated_token_address_with_program_id;
-use spl_token_2022::extension::StateWithExtensions;
+use solana_pubkey::{pubkey, Pubkey};
+use solana_signer::Signer;
+use solana_sysvar as sysvar;
+use solana_transaction::Transaction;
+use spl_associated_token_account_interface::address::get_associated_token_address_with_program_id;
+use spl_token_2022_interface::{self as spl_token_2022, extension::StateWithExtensions};
+use spl_token_interface as spl_token;
 // use stakedex_sdk::test_utils::spl_stake_pool;
-use super::amm::{Amm, KeyedAccount};
-use crate::{
-    amms::loader::amm_factory, amms::position_manager::SarosPositionManagement,
+use ahash::RandomState;
+use saros_dlmm_sdk::{
+    amms::{loader::amm_factory, position_manager::SarosPositionManagement},
     route::get_token_mints_permutations,
 };
-use ahash::RandomState;
-use solana_sdk::pubkey;
 use std::fs::{create_dir_all, remove_dir_all};
 use std::{
     collections::{HashMap, HashSet},
@@ -135,7 +140,7 @@ pub struct AmmTestHarnessProgramTest {
 }
 
 fn clone_keypair(keypair: &Keypair) -> Keypair {
-    Keypair::from_bytes(&keypair.to_bytes()).unwrap()
+    Keypair::try_from(&keypair.to_bytes()[..]).unwrap()
 }
 
 impl AmmTestHarnessProgramTest {
@@ -314,6 +319,7 @@ impl AmmTestHarnessProgramTest {
                 input_mint: *source_mint,
                 output_mint: *destination_mint,
                 swap_mode,
+                fee_mode: FeeMode::Normal,
             }) {
                 Ok(quote) => quote_result = Some(quote),
                 Err(e) => {
@@ -332,6 +338,8 @@ impl AmmTestHarnessProgramTest {
             source_token_account,
             destination_token_account,
             token_transfer_authority: token_authority,
+            user: token_authority,
+            payer: token_authority,
             quote_mint_to_referrer: None,
             in_amount: quote_result.unwrap().in_amount,
             out_amount: quote_result.unwrap().out_amount,
@@ -457,6 +465,7 @@ impl AmmTestHarnessProgramTest {
                     input_mint: *source_mint,
                     output_mint: *destination_mint,
                     swap_mode,
+                    fee_mode: FeeMode::Normal,
                 })
                 .unwrap();
             black_box(quote);
@@ -755,9 +764,9 @@ impl RpcSender for TestRpcSender {
             RpcRequest::GetVersion => Ok(json!({"solana-core": "2.1.16"})),
             _ => Err(solana_client::client_error::ClientError {
                 request: Some(request),
-                kind: solana_client::client_error::ClientErrorKind::Custom(
+                kind: Box::new(solana_client::client_error::ClientErrorKind::Custom(
                     "Method not supported".into(),
-                ),
+                )),
             }),
         }
     }
@@ -1055,6 +1064,8 @@ impl AmmTestHarness {
                     source_token_account: placeholder,
                     destination_token_account: placeholder,
                     token_transfer_authority: placeholder,
+                    user: placeholder,
+                    payer: placeholder,
                     quote_mint_to_referrer: None,
                     in_amount: *TOKEN_MINT_TO_IN_AMOUNT
                         .get(&source_mint)
@@ -1142,9 +1153,9 @@ async fn setup_token_accounts(
     reserve_mints: Vec<Pubkey>,
     with_bootstrap_amounts: bool,
 ) -> HashMap<Pubkey, (Pubkey, Pubkey)> {
-    use solana_sdk::system_instruction;
-    use spl_associated_token_account::instruction::create_associated_token_account;
-    use spl_token_2022::extension::StateWithExtensionsMut;
+    use solana_system_interface::instruction as system_instruction;
+    use spl_associated_token_account_interface::instruction::create_associated_token_account;
+    use spl_token_2022_interface::extension::StateWithExtensionsMut;
 
     let mut setup_ixs = vec![system_instruction::transfer(
         &context.payer.pubkey(),

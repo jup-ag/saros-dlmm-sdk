@@ -29,13 +29,12 @@ use saros_sdk::{
         is_swap_for_y,
     },
 };
-use solana_sdk::{
-    program_pack::IsInitialized,
-    program_pack::Pack,
-    pubkey,
-    pubkey::Pubkey,
-    sysvar::{clock, clock::Clock},
-};
+use solana_clock::Clock;
+use solana_program_pack::{IsInitialized, Pack};
+use solana_pubkey::{pubkey, Pubkey};
+use solana_sysvar::clock;
+use spl_memo_interface as spl_memo;
+use spl_token_2022_interface as spl_token_2022;
 use std::sync::{
     atomic::{AtomicI64, AtomicU64, Ordering},
     Arc,
@@ -124,6 +123,14 @@ impl Amm for SarosDlmm {
 
     fn label(&self) -> String {
         self.label.clone()
+    }
+
+    fn get_accounts_len(&self) -> usize {
+        if self.hook != self.key {
+            19
+        } else {
+            17
+        }
     }
 
     fn program_id(&self) -> Pubkey {
@@ -413,7 +420,7 @@ impl Amm for SarosDlmm {
 
     fn get_swap_and_account_metas(&self, swap_params: &SwapParams) -> Result<SwapAndAccountMetas> {
         let SwapParams {
-            token_transfer_authority,
+            user,
             source_token_account,
             destination_token_account,
             source_mint,
@@ -429,7 +436,7 @@ impl Amm for SarosDlmm {
             (destination_token_account, source_token_account)
         };
 
-        let user = *token_transfer_authority;
+        let user = *user;
         let mut account_metas = Vec::new();
 
         {
@@ -445,7 +452,7 @@ impl Amm for SarosDlmm {
             account_metas.push(AccountMeta::new_readonly(user, true));
             account_metas.push(AccountMeta::new_readonly(self.token_program[0], false));
             account_metas.push(AccountMeta::new_readonly(self.token_program[1], false));
-            account_metas.push(AccountMeta::new_readonly(spl_memo::ID, false));
+            account_metas.push(AccountMeta::new_readonly(spl_memo::v3::ID, false));
         }
 
         // If pair does not have hook, hook should be pair key (dummy)
@@ -461,12 +468,10 @@ impl Amm for SarosDlmm {
             account_metas.push(AccountMeta::new(bin_for_swap.hook_bin_array_keys[1], false));
         }
 
-        unimplemented!();
-
-        // Ok(SwapAndAccountMetas {
-        //     swap: Swap::SarosDlmm, // TODO : Add SarosDlmm to Swap enum
-        //     account_metas,
-        // })
+        Ok(SwapAndAccountMetas {
+            swap: Swap::SarosDlmm { swap_for_y },
+            account_metas,
+        })
     }
 
     fn supports_exact_out(&self) -> bool {
@@ -571,7 +576,7 @@ impl SarosPositionManagement for SarosDlmm {
                 anchor_lang::system_program::ID,
                 false,
             ));
-            account_metas.push(AccountMeta::new_readonly(spl_memo::ID, false));
+            account_metas.push(AccountMeta::new_readonly(spl_memo::v3::ID, false));
             // If pair does not have hook, hook should be pair key (dummy)
             account_metas.push(AccountMeta::new(self.hook, false));
             account_metas.push(AccountMeta::new_readonly(rewarder_hook::ID, false));

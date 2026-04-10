@@ -2,7 +2,7 @@ use itertools::Itertools;
 
 use anchor_lang::{prelude::*, InstructionData};
 use anyhow::{Ok, Result};
-use solana_sdk::instruction::Instruction;
+use solana_instruction::Instruction;
 
 use crate::math::swap_manager::SwapType;
 

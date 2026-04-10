@@ -1,10 +1,10 @@
 use anchor_lang::prelude::*;
+use solana_pubkey::Pubkey;
 
 declare_id!("1qbkdrr3z4ryLA7pZykqxvxWPoeifcVKo6ZG9CfkvVE");
 declare_program!(liquidity_book);
 
 use rand::distributions::{Distribution, Uniform};
-use solana_sdk::pubkey::Pubkey;
 
 // Now, we only support up to 8 authorities between [0, 1, 2, 3, 4, 5, 6, 7]. To create more authorities, we need to
 // add them in the monorepo. We can use from 0 up to 255 in order to prevent hot accounts.

@@ -1,5 +1,4 @@
-use solana_sdk::pubkey;
-use solana_sdk::pubkey::Pubkey;
+use solana_pubkey::{pubkey, Pubkey};
 
 pub const MAX_PROTOCOL_SHARE: u16 = 2_500;
 pub const BASIS_POINT_MAX: u64 = 10_000;

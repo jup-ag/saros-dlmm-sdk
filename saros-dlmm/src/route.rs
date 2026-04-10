@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use jupiter_amm_interface::Amm;
-use solana_sdk::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 fn get_two_permutations<T: PartialEq + Clone>(items: &[T]) -> Vec<(T, T)> {
     items

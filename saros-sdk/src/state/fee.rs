@@ -1,6 +1,6 @@
 use arrayref::{array_mut_ref, array_ref, array_refs, mut_array_refs};
-use solana_sdk::program_error::ProgramError;
-use solana_sdk::program_pack::{IsInitialized, Pack, Sealed};
+use solana_program_error::ProgramError;
+use solana_program_pack::{IsInitialized, Pack, Sealed};
 
 #[derive(PartialEq)]
 pub struct StaticFeeParameters {

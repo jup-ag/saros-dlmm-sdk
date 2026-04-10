@@ -1,10 +1,8 @@
 use anyhow::Result;
 use arrayref::{array_mut_ref, array_ref, array_refs, mut_array_refs};
-use solana_sdk::{
-    program_error::ProgramError,
-    program_pack::{IsInitialized, Pack, Sealed},
-    pubkey::Pubkey,
-};
+use solana_program_error::ProgramError;
+use solana_program_pack::{IsInitialized, Pack, Sealed};
+use solana_pubkey::Pubkey;
 
 use crate::{constants::MAX_BIN_PER_POSITION, errors::ErrorCode};
 

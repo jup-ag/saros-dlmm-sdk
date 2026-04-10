@@ -1,13 +1,16 @@
+#[path = "support/test_harness.rs"]
+mod test_harness;
+
 use std::collections::HashMap;
 
 use ahash::RandomState;
 use anyhow::Error;
 use jupiter_amm_interface::{Amm, AmmContext, ClockRef, KeyedAccount, SwapMode};
-use saros_dlmm_sdk::SarosDlmm;
-use saros_dlmm_sdk::amms::test_harness::{AmmTestHarness, AmmTestSwapParams};
 use saros_dlmm_sdk::route::get_token_mints_permutations;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::{account::Account, pubkey};
+use saros_dlmm_sdk::SarosDlmm;
+use solana_account::Account;
+use solana_pubkey::{pubkey, Pubkey};
+use test_harness::{AmmTestHarness, AmmTestSwapParams};
 
 /// Loads AMM from snapshot and tests quoting
 async fn test_quoting_for_amm_key<T: Amm + 'static>(
@@ -88,7 +91,8 @@ macro_rules! test_exact_out_amms {
 }
 
 const SAROS_DLMM_SAROS_USDC_POOL: Pubkey = pubkey!("ADPKeitAZsAeRJfhG2GoDrZENB3xt9eZmggkj7iAXY78");
-const SAROS_DLMM_LAUNCHCOIN_USDT_POOL: Pubkey = pubkey!("Cy75bt7SkreqcEE481HsKChWJPM7kkS3svVWKRPpS9UK");
+const SAROS_DLMM_LAUNCHCOIN_USDT_POOL: Pubkey =
+    pubkey!("Cy75bt7SkreqcEE481HsKChWJPM7kkS3svVWKRPpS9UK");
 
 // You can run a single test by doing: `cargo test test_quote_<lower_case_constant>_<default | option_name> -- --nocapture`
 

@@ -7,11 +7,9 @@ use crate::state::bin::BIN_ARRAY_SIZE;
 use crate::state::fee::{DynamicFeeParameters, StaticFeeParameters};
 use anyhow::Result;
 use arrayref::{array_mut_ref, array_ref, array_refs, mut_array_refs};
-use solana_sdk::program_error::ProgramError;
-use solana_sdk::{
-    program_pack::{IsInitialized, Pack, Sealed},
-    pubkey::Pubkey,
-};
+use solana_program_error::ProgramError;
+use solana_program_pack::{IsInitialized, Pack, Sealed};
+use solana_pubkey::Pubkey;
 
 pub struct Pair {
     _discriminator: [u8; 8],

@@ -1,5 +1,8 @@
+#[path = "../tests/support/test_harness.rs"]
+mod snapshot_harness;
+
 use clap::Parser;
-use saros_dlmm_sdk::amms::test_harness::take_snapshot;
+use snapshot_harness::take_snapshot;
 
 #[derive(Parser, Debug)]
 pub struct ConfigOverride {

@@ -1,13 +1,16 @@
+#[path = "support/test_harness.rs"]
+mod test_harness;
+
 use std::collections::HashMap;
 
 use ahash::RandomState;
 use jupiter_amm_interface::{Amm, AmmContext, ClockRef, KeyedAccount};
 use saros_dlmm_sdk::amms::position_manager::SarosPositionManagement;
-use saros_dlmm_sdk::amms::test_harness::AmmTestHarness;
 use saros_dlmm_sdk::route::get_token_mints_permutations;
 use saros_dlmm_sdk::SarosDlmm;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::{account::Account, pubkey};
+use solana_account::Account;
+use solana_pubkey::{pubkey, Pubkey};
+use test_harness::AmmTestHarness;
 
 /// Common test entry for position lifecycle
 async fn test_position_full_circle_for_amm_key<T>(

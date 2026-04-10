@@ -1,6 +1,6 @@
 use anchor_lang::InstructionData;
 use anyhow::{Ok, Result};
-use solana_sdk::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 use liquidity_book::liquidity_book::{
     client::args::{

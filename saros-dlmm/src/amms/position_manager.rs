@@ -2,7 +2,7 @@ use anchor_lang::prelude::AccountMeta;
 use anyhow::Result;
 use jupiter_amm_interface::Amm;
 use saros_sdk::instruction::{CreatePositionParams, ModifierPositionParams};
-use solana_sdk::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 pub trait SarosPositionManagement: Amm {
     fn has_hook(&self) -> bool;

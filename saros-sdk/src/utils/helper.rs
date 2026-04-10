@@ -1,6 +1,6 @@
 use crate::state::{bin::BIN_ARRAY_SIZE, position::Position};
 use rewarder_hook::rewarder_hook;
-use solana_sdk::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 use crate::constants::HOOK_PROGRAM_ID;
 

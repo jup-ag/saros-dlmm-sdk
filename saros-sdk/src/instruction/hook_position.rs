@@ -1,6 +1,7 @@
 use anchor_lang::{prelude::AccountMeta, system_program, InstructionData};
 use rewarder_hook::rewarder_hook::client::args::InitializePosition as InitializePositionArgs;
-use solana_sdk::{instruction::Instruction, pubkey::Pubkey};
+use solana_instruction::Instruction;
+use solana_pubkey::Pubkey;
 
 use crate::utils::helper::{find_event_authority, find_hook_position};
 

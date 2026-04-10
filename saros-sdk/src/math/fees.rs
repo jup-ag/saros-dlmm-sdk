@@ -1,11 +1,16 @@
-use solana_sdk::pubkey::Pubkey;
-use spl_token_2022::{
-    self,
-    extension::{self, BaseStateWithExtensions, StateWithExtensions, transfer_fee::TransferFee},
+use solana_pubkey::Pubkey;
+use spl_token_2022_interface::{
+    self as spl_token_2022,
+    extension::{self, transfer_fee::TransferFee, BaseStateWithExtensions, StateWithExtensions},
 };
+use spl_token_interface as spl_token;
 
 use crate::{constants::BASIS_POINT_MAX, errors::ErrorCode};
 use anyhow::Result;
+
+fn is_spl_token_owner(owner: &Pubkey) -> bool {
+    owner.to_bytes() == spl_token::ID.to_bytes()
+}
 
 /// Encapsulates all fee information and calculations for swap operations
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -23,7 +28,7 @@ impl TokenTransferFee {
         mint_y_owner: &Pubkey,
         epoch: u64,
     ) -> Result<Self> {
-        if mint_x_owner == &spl_token::ID {
+        if is_spl_token_owner(mint_x_owner) {
             self.epoch_transfer_fee_x = None;
         } else {
             let token_mint_unpacked =
@@ -36,7 +41,7 @@ impl TokenTransferFee {
             }
         }
 
-        if mint_y_owner == &spl_token::ID {
+        if is_spl_token_owner(mint_y_owner) {
             self.epoch_transfer_fee_y = None;
         } else {
             let token_mint_unpacked =

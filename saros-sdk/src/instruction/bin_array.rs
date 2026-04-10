@@ -1,6 +1,7 @@
 use anchor_lang::{prelude::AccountMeta, system_program, InstructionData};
 use liquidity_book::liquidity_book::client::args::InitializeBinArray as InitializeBinArrayArgs;
-use solana_sdk::{instruction::Instruction, pubkey::Pubkey};
+use solana_instruction::Instruction;
+use solana_pubkey::Pubkey;
 
 use crate::utils::helper::find_event_authority;
 

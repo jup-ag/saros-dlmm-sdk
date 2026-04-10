@@ -4,42 +4,99 @@ version = "0.1.0"
 description = ""
 edition = { workspace = true }
 
+[features]
+default = []
+snapshot-cli = [
+    "dep:ahash",
+    "dep:assert_matches",
+    "dep:async-trait",
+    "dep:clap",
+    "dep:glob",
+    "dep:serde_json",
+    "dep:solana-account",
+    "dep:solana-account-decoder",
+    "dep:solana-client",
+    "dep:solana-compute-budget-interface",
+    "dep:solana-instruction",
+    "dep:solana-keypair",
+    "dep:solana-program-option",
+    "dep:solana-program-test",
+    "dep:solana-signature",
+    "dep:solana-signer",
+    "dep:solana-system-interface",
+    "dep:solana-transaction",
+    "dep:spl-associated-token-account-interface",
+    "dep:spl-token-interface",
+    "dep:tokio",
+]
+
 [dependencies]
 jupiter-amm-interface = { workspace = true }
 anchor-lang = { workspace = true }
-solana-sdk = { workspace = true }
-solana-client = { workspace = true }
-solana-account-decoder = { workspace = true }
-solana-program = { workspace = true }
+solana-clock = { workspace = true }
+solana-program-pack = { workspace = true }
+solana-pubkey = { workspace = true }
+solana-sysvar = { workspace = true }
 anyhow = { workspace = true }
-bytemuck = { workspace = true }
 rust_decimal = { workspace = true }
-spl-token-2022 = { workspace = true }
-spl-token = { workspace = true }
-spl-memo = { workspace = true }
+spl-token-2022-interface = { workspace = true }
+spl-memo-interface = { workspace = true }
 ruint = { workspace = true }
 itertools = { workspace = true }
+lazy_static = { workspace = true }
+bincode = { workspace = true }
 
 liquidity-book = { workspace = true }
 rewarder-hook = { workspace = true }
 saros-sdk = { workspace = true }
 
+ahash = { workspace = true, optional = true }
+assert_matches = { workspace = true, optional = true }
+async-trait = { workspace = true, optional = true }
+glob = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+solana-account = { workspace = true, optional = true }
+solana-account-decoder = { workspace = true, optional = true }
+solana-client = { workspace = true, optional = true }
+solana-compute-budget-interface = { workspace = true, optional = true }
+solana-instruction = { workspace = true, optional = true }
+solana-keypair = { workspace = true, optional = true }
+solana-program-option = { workspace = true, optional = true }
+solana-program-test = { workspace = true, optional = true }
+solana-signature = { workspace = true, optional = true }
+solana-signer = { workspace = true, optional = true }
+solana-system-interface = { workspace = true, optional = true }
+solana-transaction = { workspace = true, optional = true }
+spl-associated-token-account-interface = { workspace = true, optional = true }
+spl-token-interface = { workspace = true, optional = true }
+tokio = { workspace = true, features = ["full"], optional = true }
+clap = { version = "~4.1", features = ["derive"], optional = true }
+
+[[bin]]
+name = "saros-dlmm-sdk"
+path = "src/main.rs"
+required-features = ["snapshot-cli"]
+
+[dev-dependencies]
+ahash = { workspace = true }
 assert_matches = { workspace = true }
 async-trait = { workspace = true }
 glob = { workspace = true }
-lazy_static = { workspace = true }
-serde_json = { workspace = true }
-solana-program-test = { workspace = true }
-ahash = { workspace = true }
-bincode = { workspace = true }
 paste = "1.0.13"
-tokio = { workspace = true, features = ["full"] }
-clap = { version = "~4.1", features = ["derive"] }
-
-spl-associated-token-account = { workspace = true, features = [
-    "no-entrypoint",
-] }
-anchor-spl = { version = "0.31.1", features = ["memo"] }
-
-[dev-dependencies]
 proptest = { workspace = true }
+serde_json = { workspace = true }
+solana-account = { workspace = true }
+solana-account-decoder = { workspace = true }
+solana-client = { workspace = true }
+solana-compute-budget-interface = { workspace = true }
+solana-instruction = { workspace = true }
+solana-keypair = { workspace = true }
+solana-program-option = { workspace = true }
+solana-program-test = { workspace = true }
+solana-signature = { workspace = true }
+solana-signer = { workspace = true }
+solana-system-interface = { workspace = true }
+solana-transaction = { workspace = true }
+spl-associated-token-account-interface = { workspace = true }
+spl-token-interface = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
